@@ -1,0 +1,13 @@
+form{
+  display: flex;
+  align-items: baseline;
+}
+.navbar{
+  justify-content: center;
+
+}
+
+form> input{
+  height: 37px;
+  margin: 8px;
+}
