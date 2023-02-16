@@ -1,7 +1,7 @@
 import InfiniteScroll from 'infinite-scroll';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-var lightbox = new SimpleLightbox('.gallery a', {});
+var lightbox = new SimpleLightbox('.photo-card a', {});
 const axios = require('axios').default;
 const refs = {
   container: document.querySelector('.gallery'),
@@ -11,16 +11,8 @@ const refs = {
 let query = null;
 let page = 1;
 // const BASE_URL = ;
-refs.container.addEventListener('click', onImgClick),
-  refs.form.addEventListener('submit', onSubmit);
-function onImgClick(e) {
-  // console.log(e.target);
-  // e.preventDefault();
-  if (e.target.nodeName !== 'IMG') {
-    return;
-  }
-  lightbox.open();
-}
+refs.form.addEventListener('submit', onSubmit);
+
 function onSubmit(e) {
   e.preventDefault();
   query = refs.form.elements.searchQuery.value;
@@ -31,7 +23,7 @@ function onSubmit(e) {
 async function fetchImgs() {
   try {
     const response = await axios.get(
-      `https://pixabay.com/api?key=33673211-c1a6432360cae6f7a6957d257&q=${query}&page=${page}&per_page=10&image_type=photo&orientation=horizontal&safesearch=false`
+      `https://pixabay.com/api?key=33673211-c1a6432360cae6f7a6957d257&q=${query}&page=${page}&per_page=20&image_type=photo&orientation=horizontal&safesearch=false`
     );
     return response;
   } catch (error) {
@@ -71,10 +63,38 @@ async function createCard(imgs) {
     })
     .join('');
   refs.container.innerHTML = markup;
+  lightbox.refresh();
+  var target = document.querySelectorAll('article').forEach(el => {
+    observer.observe(el);
+    // console.log('watching', el);
+  });
+  // console.log(target);
 }
 function increementPageValue() {
   page += 1;
 }
+
+const options = {
+  root: null,
+  rootMargin: '-250px 0px',
+  threshold: 1,
+};
+var callback = function (entries, observer) {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      console.log('intersecting');
+      console.log(entry.target);
+    }
+    // entry.time; // a DOMHightResTimeStamp indicating when the intersection occurred.
+    // entry.rootBounds; // a DOMRectReadOnly for the intersection observer's root.
+    // entry.boundingClientRect; // a DOMRectReadOnly for the intersection observer's target.
+    // entry.intersectionRect; // a DOMRectReadOnly for the visible portion of the intersection observer's target.
+    // entry.intersectionRatio; // the number for the ratio of the intersectionRect to the boundingClientRect.
+    // entry.target; // the Element whose intersection with the intersection root changed.
+    // entry.isIntersecting; // intersecting: true or false
+  });
+};
+var observer = new IntersectionObserver(callback, options);
 
 // let infScroll = new InfiniteScroll('.grid', {
 //   // Infinite Scroll options...
