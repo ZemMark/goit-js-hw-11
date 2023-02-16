@@ -3,3 +3,16 @@
   grid-template-columns: 1fr 1fr 1fr ; 
   // grid-template-columns: 350px 350px 350px;
 }
+.previewImg{
+  width: 80%;
+}
+.info{
+  display: flex;
+}
+.info:not(:last-child){
+  margin-right: 10px;
+}
+.photo-card{
+  height: 300px;
+
+}
