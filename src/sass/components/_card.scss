@@ -1,6 +1,19 @@
-.info-item{
+p.info-item{
   font-size: 12px;
+  margin: 0;
+  border-radius: 8px;
 }
-img {
-  width: 200px;
+// img {
+//   // width: 200px;
+// }
+.photo-card {
+  width: 250px;
+  background-color: #fff;
+  border-radius: 10px;
+  height: 210px;
+  gap: 10px;
+  display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+
 }

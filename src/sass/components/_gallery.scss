@@ -1,6 +1,7 @@
 .gallery{
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr ; 
+  grid-template-columns: 1fr 1fr 1fr 1fr; 
+  gap: 20px;
   // grid-template-columns: 350px 350px 350px;
 }
 .previewImg{
@@ -12,7 +13,4 @@
 .info:not(:last-child){
   margin-right: 10px;
 }
-.photo-card{
-  height: 300px;
 
-}

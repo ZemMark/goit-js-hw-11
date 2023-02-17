@@ -40,7 +40,7 @@ async function fetchImgs() {
     // showLoader();
 
     const response = await axios.get(
-      `https://pixabay.com/api?key=33673211-c1a6432360cae6f7a6957d257&q=${query}&page=${page}&per_page=${perPage}&image_type=photo&orientation=horizontal&safesearch=true&min_width=320&min_height=240`
+      `https://pixabay.com/api?key=33673211-c1a6432360cae6f7a6957d257&q=${query}&page=${page}&per_page=${perPage}&image_type=photo&orientation=horizontal&safesearch=true&min_width=320&max_height=220`
     );
     return response;
   } catch (error) {
