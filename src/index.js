@@ -7,17 +7,23 @@ const refs = {
   container: document.querySelector('.gallery'),
   form: document.querySelector('form'),
   imgRef: document.querySelector('.link'),
+  inputRef: document.querySelector('input'),
 };
 let query = '';
 let page = 1;
 const perPage = 20;
+// refs.inputRef.addEventListener('input', debounce(onInput, 500));
 // const BASE_URL = ;
 refs.form.addEventListener('submit', onSubmit);
+// function onInput(e) {
+//   query = e.target.value.trim();
+//   console.log(query);
+// }
 
-function onSubmit(e, img) {
-  console.log(img);
+function onSubmit(e) {
   e.preventDefault();
-  query = refs.form.elements.searchQuery.value.trim();
+  query = refs.inputRef.value.trim();
+  console.log(query);
   if (!query || query === '') {
     console.log('wron query');
     return;
@@ -41,9 +47,14 @@ async function fetchImgs() {
 }
 async function renderImg() {
   const response = await fetchImgs();
-  if (response.data.totalHits !== []) {
-    createCard(response);
+  if (response.data.total === 0) {
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      `<div style="text-align: center; padding-top: 200px"><h1 style="color: #777">There are no matches :(</h1></div>`
+    );
+    return;
   }
+  createCard(response);
 }
 
 async function createCard(imgs) {
