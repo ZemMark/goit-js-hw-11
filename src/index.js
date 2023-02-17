@@ -52,12 +52,14 @@ async function renderImg() {
   const response = await fetchImgs();
 
   if (response.data.total === 0) {
+    hideLoader();
     document
       .querySelector('.failure-title')
       .insertAdjacentHTML(
         'beforeend',
         `<h1 class="error-title">There are no matches :(</h1>`
       );
+    return;
   }
   createCard(response);
   if (page === 1) {
