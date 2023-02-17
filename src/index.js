@@ -1,4 +1,5 @@
 import debounce from 'lodash.debounce';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 var lightbox = new SimpleLightbox('.photo-card a', {});
@@ -12,34 +13,31 @@ const refs = {
 let query = '';
 let page = 1;
 const perPage = 20;
-// refs.inputRef.addEventListener('input', debounce(onInput, 500));
-// const BASE_URL = ;
+
 refs.form.addEventListener('submit', onSubmit);
-// function onInput(e) {
-//   query = e.target.value.trim();
-//   console.log(query);
-// }
 
 function onSubmit(e) {
   e.preventDefault();
+  page = 1;
+  resetContainer();
+  console.log('this should be 1' + ': ' + page);
+
   query = refs.inputRef.value.trim();
   console.log(query);
+  refs.inputRef.blur();
   if (!query || query === '') {
     console.log('wron query');
     return;
   }
   renderImg();
-  console.log(query);
-
-  // console.log(query);
+  killSubmitButton();
 }
 
 async function fetchImgs() {
   try {
     const response = await axios.get(
-      `https://pixabay.com/api?key=33673211-c1a6432360cae6f7a6957d257&q=${query}&page=${page}&per_page=${perPage}&image_type=photo&orientation=horizontal&safesearch=false`
+      `https://pixabay.com/api?key=33673211-c1a6432360cae6f7a6957d257&q=${query}&page=${page}&per_page=${perPage}&image_type=photo&orientation=horizontal&safesearch=true&min_width=320&min_height=240`
     );
-
     return response;
   } catch (error) {
     console.error(error);
@@ -47,42 +45,54 @@ async function fetchImgs() {
 }
 async function renderImg() {
   const response = await fetchImgs();
+
   if (response.data.total === 0) {
-    document.body.insertAdjacentHTML(
-      'beforeend',
-      `<div style="text-align: center; padding-top: 200px"><h1 style="color: #777">There are no matches :(</h1></div>`
-    );
-    return;
+    document
+      .querySelector('.failure-title')
+      .insertAdjacentHTML(
+        'beforeend',
+        `<h1 class="error-title">There are no matches :(</h1>`
+      );
   }
   createCard(response);
+  if (page === 1) {
+    showTotalHints(response);
+  }
+
+  if (page !== 1) {
+    smothScroll();
+  }
+  increasePageValue();
 }
 
 async function createCard(imgs) {
   console.log(imgs.data);
   const markup = imgs.data.hits
-    .map(({ webformatURL, largeImageURL }) => {
-      return `
+    .map(
+      ({ webformatURL, largeImageURL, likes, comments, downloads, views }) => {
+        return `
       <article class="photo-card post grid__item " >
       <a href="${largeImageURL}" class="link">
       <img class="previewImg" src="${webformatURL}" alt="" loading="lazy" />
       </a>
   <div class="info">
     <p class="info-item">
-      <b>Likes</b>
+      <b>Likes: ${likes}</b>
     </p>
     <p class="info-item">
-      <b>Views</b>
+      <b>Views: ${views}</b>
     </p>
     <p class="info-item">
-      <b>Comments</b>
+      <b>Comments: ${comments}</b>
     </p>
     <p class="info-item">
-      <b>Downloads</b>
+      <b>Downloads: ${downloads}</b>
     </p>
   </div>
 </article>
     `;
-    })
+      }
+    )
     .join('');
   refs.container.insertAdjacentHTML('beforeend', markup);
   lightbox.refresh();
@@ -92,19 +102,47 @@ async function createCard(imgs) {
 const options = {
   root: null,
   rootMargin: '0px',
-  threshold: 0.5,
+  threshold: 0.1,
 };
 
 var observer = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       console.log('порадьте психолога');
-      page += 1;
       console.log(page);
       renderImg();
     }
   });
 }, options);
+
+function resetContainer() {
+  refs.container.innerHTML = '';
+  document.querySelector('.failure-title').innerHTML = '';
+}
+function showTotalHints(response) {
+  Notify.info('we found' + ' ' + response.data.total + ' ' + 'images');
+}
+function killSubmitButton() {
+  refs.form.elements.submit.disabled = true;
+}
+refs.inputRef.addEventListener('input', onInput);
+function onInput() {
+  refs.form.elements.submit.disabled = false;
+}
+function smothScroll() {
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 1.5,
+    behavior: 'smooth',
+  });
+}
+function increasePageValue() {
+  page += 1;
+}
+// написать скрипт для меншої кількості постів ніж 20
 
 // var intersectionObserver = new IntersectionObserver(entries => {
 //   if (entries[0].intersectionRatio <= 0) return;
