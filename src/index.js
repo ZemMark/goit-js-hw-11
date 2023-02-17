@@ -9,6 +9,8 @@ const refs = {
   form: document.querySelector('form'),
   imgRef: document.querySelector('.link'),
   inputRef: document.querySelector('input'),
+  spinner: document.querySelector('.text-center'),
+  failureTitleRef: document.querySelector('.failure-title'),
 };
 let query = '';
 let page = 1;
@@ -35,6 +37,8 @@ function onSubmit(e) {
 
 async function fetchImgs() {
   try {
+    // showLoader();
+
     const response = await axios.get(
       `https://pixabay.com/api?key=33673211-c1a6432360cae6f7a6957d257&q=${query}&page=${page}&per_page=${perPage}&image_type=photo&orientation=horizontal&safesearch=true&min_width=320&min_height=240`
     );
@@ -44,6 +48,7 @@ async function fetchImgs() {
   }
 }
 async function renderImg() {
+  showLoader();
   const response = await fetchImgs();
 
   if (response.data.total === 0) {
@@ -56,18 +61,19 @@ async function renderImg() {
   }
   createCard(response);
   if (page === 1) {
-    showTotalHints(response);
   }
 
   if (page !== 1) {
     smothScroll();
   }
   increasePageValue();
+  hideLoader();
+  // showEndOfPhotosWarning();
 }
 
-async function createCard(imgs) {
-  console.log(imgs.data);
-  const markup = imgs.data.hits
+async function createCard({ data }) {
+  console.log(data);
+  const markup = data.hits
     .map(
       ({ webformatURL, largeImageURL, likes, comments, downloads, views }) => {
         return `
@@ -97,12 +103,15 @@ async function createCard(imgs) {
   refs.container.insertAdjacentHTML('beforeend', markup);
   lightbox.refresh();
   observer.observe(document.querySelector('.target'));
+  const cards = document.querySelectorAll('article');
+  console.log(cards.length);
+  // showTotalHints(cards, data);
 }
 
 const options = {
   root: null,
   rootMargin: '0px',
-  threshold: 0.1,
+  threshold: 1,
 };
 
 var observer = new IntersectionObserver(entries => {
@@ -142,6 +151,24 @@ function smothScroll() {
 function increasePageValue() {
   page += 1;
 }
+function hideLoader() {
+  refs.spinner.classList.add('spinner-hidden');
+
+  refs.spinner.addEventListener('transitioned', () => {
+    document.body.removeChild('spinner-border');
+  });
+}
+function showLoader() {
+  refs.spinner.classList.remove('spinner-hidden');
+}
+
+// function showEndOfPhotosWarning(cards, data) {
+//   console.log(data);
+//   // // if (cards.length === imgs.data.total)
+//   // //   refs.failureTitleRef.innerHTML = `
+//   // //   <h2 style='color: #999'>that is all muther fucker!</h2>
+//   // `;
+// }
 // написать скрипт для меншої кількості постів ніж 20
 
 // var intersectionObserver = new IntersectionObserver(entries => {
