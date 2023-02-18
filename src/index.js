@@ -12,17 +12,28 @@ const refs = {
   inputRef: document.querySelector('input'),
   spinner: document.querySelector('.text-center'),
   failureTitleRef: document.querySelector('.failure-title'),
+  submitBtn: document.querySelector('#submit'),
 };
 let query = '';
 let page = 1;
 const perPage = 20;
 
 refs.form.addEventListener('submit', onSubmit);
+// refs.submitBtn.onclick = () => {
 
+// };
 function onSubmit(e) {
   e.preventDefault();
   page = 1;
   resetContainer();
+  document.querySelector('.gallery').scrollIntoView({ behavior: 'smooth' });
+
+  // window.location.hash = 'gallery';
+  $(function () {
+    $.scrollify({
+      section: '.gallery',
+    });
+  });
   console.log('this should be 1' + ': ' + page);
 
   query = refs.inputRef.value.trim();
@@ -63,9 +74,6 @@ async function renderImg() {
     return;
   }
   createCard(response);
-  if (page === 1) {
-  }
-
   if (page !== 1) {
     smothScroll();
   }
@@ -161,7 +169,7 @@ function smothScroll() {
     .firstElementChild.getBoundingClientRect();
 
   window.scrollBy({
-    top: cardHeight * 1.5,
+    top: cardHeight * 3,
     behavior: 'smooth',
   });
 }
@@ -178,45 +186,21 @@ function hideLoader() {
 function showLoader() {
   refs.spinner.classList.remove('spinner-hidden');
 }
-
-// function showEndOfPhotosWarning(cards, data) {
-//   console.log(data);
-//   // // if (cards.length === imgs.data.total)
-//   // //   refs.failureTitleRef.innerHTML = `
-//   // //   <h2 style='color: #999'>that is all muther fucker!</h2>
-//   // `;
-// }
-// написать скрипт для меншої кількості постів ніж 20
-
-// var intersectionObserver = new IntersectionObserver(entries => {
-//   if (entries[0].intersectionRatio <= 0) return;
-//   const T = entries.forEach(entry => entry.target);
-//   page += 1;
-//   fetchImgs();
-//   // console.log('Loaded new items');
-// }, options);
-
-// window.addEventListener('scroll', () => {
-//   const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-//   // fdvsd
-
-//   if (scrollTop + clientHeight >= scrollHeight) {
-//     page += 1;
-//     renderImg();
-//   }
-//   // fsvsdfvsdf
+// $.scrollify({
+//   section: '.example-classname',
+//   sectionName: 'section-name',
+//   interstitialSection: '',
+//   easing: 'easeOutExpo',
+//   scrollSpeed: 1100,
+//   offset: 0,
+//   scrollbars: true,
+//   standardScrollElements: '',
+//   setHeights: true,
+//   overflowScroll: true,
+//   updateHash: true,
+//   touchScroll: true,
+//   before: function () {},
+//   after: function () {},
+//   afterResize: function () {},
+//   afterRender: function () {},
 // });
-
-// function windowScroll() {
-//   window.scrollBy({
-//     top: cardHeight,
-//     behavior: 'smooth',
-//   });
-// }
-
-// if (page >= 2) {
-//   const { height: cardHeight } = document
-//     .querySelector('.gallery')
-//     .getBoundingClientRect();
-//   windowScroll(cardHeight);
-// }
