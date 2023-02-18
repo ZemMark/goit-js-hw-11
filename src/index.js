@@ -3,6 +3,7 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import { comments, likes, views, downloads } from './js/svgRefs';
+// import './js/scrollBtn';
 var lightbox = new SimpleLightbox('.photo-card a', {});
 const axios = require('axios').default;
 const refs = {
@@ -26,7 +27,7 @@ function onSubmit(e) {
   e.preventDefault();
   page = 1;
   resetContainer();
-  document.querySelector('.gallery').scrollIntoView({ behavior: 'smooth' });
+  // document.querySelector('.gallery').scrollIntoView({ behavior: 'smooth' });
 
   // window.location.hash = 'gallery';
   // $(function () {
@@ -45,12 +46,11 @@ function onSubmit(e) {
   }
   renderImg();
   killSubmitButton();
+  // showTotalHints(response);
 }
 
 async function fetchImgs() {
   try {
-    // showLoader();
-
     const response = await axios.get(
       `https://pixabay.com/api?key=33673211-c1a6432360cae6f7a6957d257&q=${query}&page=${page}&per_page=${perPage}&image_type=photo&orientation=horizontal&safesearch=true&min_width=320&max_height=220`
     );
@@ -62,6 +62,7 @@ async function fetchImgs() {
 async function renderImg() {
   showLoader();
   const response = await fetchImgs();
+  console.log(response);
 
   if (response.data.total === 0) {
     hideLoader();
@@ -74,12 +75,11 @@ async function renderImg() {
     return;
   }
   createCard(response);
-  if (page !== 1) {
-    smothScroll();
-  }
+  smothScroll();
   increasePageValue();
   hideLoader();
-  showTotalHints(response);
+  lightbox.refresh();
+
   // showEndOfPhotosWarning();
 }
 
@@ -127,7 +127,6 @@ async function createCard({ data }) {
     )
     .join('');
   refs.container.insertAdjacentHTML('beforeend', markup);
-  lightbox.refresh();
   observer.observe(document.querySelector('.target'));
   const cards = document.querySelectorAll('article');
   console.log(cards.length);
@@ -187,6 +186,28 @@ function hideLoader() {
 function showLoader() {
   refs.spinner.classList.remove('spinner-hidden');
 }
+// Get the button:
+// let mybutton = document.getElementById('myBtn');
+
+// When the user scrolls down 20px from the top of the document, show the button
+// window.onscroll = function () {
+//   scrollFunction();
+// };
+
+// function scrollFunction() {
+//   if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+//     mybutton.style.display = 'block';
+//   } else {
+//     mybutton.style.display = 'none';
+//   }
+// }
+
+// When the user clicks on the button, scroll to the top of the document
+// function topFunction() {
+//   document.body.scrollTop = 0; // For Safari
+//   document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+// }
+
 // $.scrollify({
 //   section: '.example-classname',
 //   sectionName: 'section-name',
