@@ -7,6 +7,8 @@ import { comments, likes, views, downloads } from './js/svgRefs';
 var lightbox = new SimpleLightbox('.photo-card a', {});
 import axios from 'axios';
 // const axios = require('axios/dist/browser/axios.cjs');
+const controller = new AbortController();
+let cancel;
 const refs = {
   container: document.querySelector('.gallery'),
   form: document.querySelector('form'),
@@ -21,39 +23,26 @@ let page = 1;
 const perPage = 20;
 
 refs.form.addEventListener('submit', onSubmit);
-// refs.submitBtn.onclick = () => {
-
-// };
-function onSubmit(e) {
+function onSubmit(e, response) {
   e.preventDefault();
   page = 1;
   resetContainer();
-  // document.querySelector('.gallery').scrollIntoView({ behavior: 'smooth' });
-
-  // window.location.hash = 'gallery';
-  // $(function () {
-  //   $.scrollify({
-  //     section: '.gallery',
-  //   });
-  // });
-  console.log('this should be 1' + ': ' + page);
-
   query = refs.inputRef.value.trim();
-  console.log(query);
   refs.inputRef.blur();
   if (!query || query === '') {
-    console.log('wron query');
     return;
   }
   renderImg();
   killSubmitButton();
-  // showTotalHints(response);
 }
 
 async function fetchImgs() {
   try {
     const response = await axios.get(
-      `https://pixabay.com/api/?key=33673211-c1a6432360cae6f7a6957d257&q=${query}&page=${page}&per_page=${perPage}&image_type=photo&orientation=horizontal&safesearch=true&min_width=320&min_height=220`
+      `https://pixabay.com/api/?key=33673211-c1a6432360cae6f7a6957d257&q=${query}&page=${page}&per_page=${perPage}&image_type=photo&orientation=horizontal&safesearch=true&min_width=320&min_height=220`,
+      {
+        signal: controller.signal,
+      }
     );
     return response;
   } catch (error) {
@@ -63,9 +52,12 @@ async function fetchImgs() {
 async function renderImg() {
   showLoader();
   const response = await fetchImgs();
-  console.log(response);
-
-  if (response.data.total === 0) {
+  if (page === 1) {
+    showTotalHints(response);
+  }
+  let warning = false;
+  if (response.data.total === 0 || warning === true) {
+    warning = true;
     hideLoader();
     document
       .querySelector('.failure-title')
@@ -80,12 +72,17 @@ async function renderImg() {
   increasePageValue();
   hideLoader();
   lightbox.refresh();
-
-  // showEndOfPhotosWarning();
+  const cards = document.querySelectorAll('article');
+  if (cards.length >= response.data.total) {
+    // cancel();
+    // controller.abort();
+    finitaLaComedia();
+    console.log('appended');
+    return;
+  }
 }
 
 async function createCard({ data }) {
-  console.log(data);
   const markup = data.hits
     .map(
       ({ webformatURL, largeImageURL, likes, comments, downloads, views }) => {
@@ -110,8 +107,9 @@ async function createCard({ data }) {
     </div>
     <div class="info-item">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" class="bi bi-chat-dots" viewBox="0 0 16 16">
-  <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-  <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2z"/>
+  <smth d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+  <smth d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2z"/>
+
 </svg>
       <b>${comments}</b>
     </div>
@@ -129,8 +127,7 @@ async function createCard({ data }) {
     .join('');
   refs.container.insertAdjacentHTML('beforeend', markup);
   observer.observe(document.querySelector('.target'));
-  const cards = document.querySelectorAll('article');
-  console.log(cards.length);
+
   // showTotalHints(cards, data);
 }
 
@@ -154,9 +151,7 @@ function resetContainer() {
   refs.container.innerHTML = '';
   document.querySelector('.failure-title').innerHTML = '';
 }
-function showTotalHints(response) {
-  Notify.info('we found' + ' ' + response.data.total + ' ' + 'images');
-}
+
 function killSubmitButton() {
   refs.form.elements.submit.disabled = true;
 }
@@ -187,6 +182,19 @@ function hideLoader() {
 function showLoader() {
   refs.spinner.classList.remove('spinner-hidden');
 }
+function showTotalHints(response) {
+  Notify.info('we found' + ' ' + response.data.total + ' ' + 'images');
+}
+function finitaLaComedia() {
+  // const endResultTitle = document.createElement('h2');
+  // endResultTitle.textContent = 'NO MORE RESULTS';
+  // endResultTitle.style.color = '#F4DB7F';
+  refs.container.insertAdjacentHTML(
+    'beforeend',
+    `<h1 class="finish">no more results</h1>`
+  );
+}
+
 // Get the button:
 // let mybutton = document.getElementById('myBtn');
 
