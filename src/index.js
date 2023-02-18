@@ -29,11 +29,11 @@ function onSubmit(e) {
   document.querySelector('.gallery').scrollIntoView({ behavior: 'smooth' });
 
   // window.location.hash = 'gallery';
-  $(function () {
-    $.scrollify({
-      section: '.gallery',
-    });
-  });
+  // $(function () {
+  //   $.scrollify({
+  //     section: '.gallery',
+  //   });
+  // });
   console.log('this should be 1' + ': ' + page);
 
   query = refs.inputRef.value.trim();
@@ -79,6 +79,7 @@ async function renderImg() {
   }
   increasePageValue();
   hideLoader();
+  showTotalHints(response);
   // showEndOfPhotosWarning();
 }
 
