@@ -5,8 +5,8 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 import { comments, likes, views, downloads } from './js/svgRefs';
 // import './js/scrollBtn';
 var lightbox = new SimpleLightbox('.photo-card a', {});
-// const axios = require('axios').default;
-const axios = require('axios/dist/browser/axios.cjs');
+import axios from 'axios';
+// const axios = require('axios/dist/browser/axios.cjs');
 const refs = {
   container: document.querySelector('.gallery'),
   form: document.querySelector('form'),
