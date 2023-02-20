@@ -1,16 +1,25 @@
 .failure-title{
   text-align: center;
     padding-top: 200px;
+    background-color: #000;
 
 }
 .error-title{
   color: #999;
   position: absolute;
   top: 150;
-  left: 350;
+  left: 50%;
+  transform: translateX(-50%);
   @media screen and (max-width: 412px) {
     top: 70;
     left: 30;
   }
 
+}
+.no-more-res{
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 80px;
 }

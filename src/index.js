@@ -28,6 +28,8 @@ function onSubmit(e, response) {
   }
   renderImg();
   killSubmitButton();
+  showHideToTheUpBtn();
+  scrollToTop();
 }
 
 async function fetchImgs() {
@@ -66,14 +68,15 @@ async function renderImg() {
   increasePageValue();
   hideLoader();
   lightbox.refresh();
-  const cards = document.querySelectorAll('article');
-  if (cards.length >= response.data.total) {
-    // cancel();
-    // controller.abort();
-    finitaLaComedia();
-    console.log('appended');
-    return;
-  }
+  console.log('response: ', response);
+
+  // if (cards.length >= response.data.total) {
+  //   // cancel();
+  //   // controller.abort();
+  //   unobserveTarget();
+  //   console.log('appended');
+  //   return;
+  // }
 }
 
 async function createCard({ data }) {
@@ -121,6 +124,8 @@ async function createCard({ data }) {
     .join('');
   refs.container.insertAdjacentHTML('beforeend', markup);
   observer.observe(document.querySelector('.target'));
+  let cards = document.querySelectorAll('article');
+  unobserveTarget(cards, data.total);
 
   // showTotalHints(cards, data);
 }
@@ -179,15 +184,14 @@ function showLoader() {
 function showTotalHints(response) {
   Notify.info('we found' + ' ' + response.data.total + ' ' + 'images');
 }
-function finitaLaComedia() {
-  // const endResultTitle = document.createElement('h2');
-  // endResultTitle.textContent = 'NO MORE RESULTS';
-  // endResultTitle.style.color = '#F4DB7F';
-  refs.container.insertAdjacentHTML(
-    'beforeend',
-    `<h1 class="finish">no more results</h1>`
-  );
+function unobserveTarget(cards, total) {
+  if (cards.length >= total) {
+    console.log('length', cards.length, 'total', total);
+    observer.unobserve(document.querySelector('.target'));
+    const endResultTitle = document.createElement('h2');
+    endResultTitle.textContent = 'NO MORE RESULTS';
+    endResultTitle.style.color = '#F4DB7F';
+    endResultTitle.classList.add('no-more-res');
+    document.querySelector('.section-failure').appendChild(endResultTitle);
+  }
 }
-
-showHideToTheUpBtn();
-scrollToTop();
