@@ -1,9 +1,10 @@
 import debounce from 'lodash.debounce';
+import throttle from 'lodash.throttle';
 import { refs } from './refs';
 export function showHideToTheUpBtn() {
   window.addEventListener(
     'scroll',
-    debounce(() => {
+    throttle(() => {
       if (window.pageYOffset > 400) {
         refs.scrollToTop.style.display = 'flex';
       } else {

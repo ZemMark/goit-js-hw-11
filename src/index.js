@@ -185,13 +185,14 @@ function showTotalHints(response) {
 }
 function unobserveTarget(cards, total) {
   if (cards.length >= total) {
-    console.log('length', cards.length, 'total', total);
     observer.unobserve(document.querySelector('.target'));
     const endResultTitle = document.createElement('h2');
     endResultTitle.textContent = 'NO MORE RESULTS';
     endResultTitle.style.color = '#999';
+    endResultTitle.style.display = 'block';
     endResultTitle.classList.add('no-more-res');
     document.querySelector('.section-failure').appendChild(endResultTitle);
+    console.log('length', cards.length, 'total', total);
   }
   showDivForFailrule();
 }
